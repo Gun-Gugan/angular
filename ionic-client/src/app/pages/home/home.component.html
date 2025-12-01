@@ -1,0 +1,56 @@
+```html
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Application Form</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="max-w-2xl mx-auto">
+    <form (ngSubmit)="submit()" #f="ngForm">
+
+      <ion-item lines="full">
+        <ion-label position="floating">Name</ion-label>
+        <ion-input [(ngModel)]="form.name" name="name" required></ion-input>
+      </ion-item>
+
+      <ion-item lines="full">
+        <ion-label position="floating">Email</ion-label>
+        <ion-input [(ngModel)]="form.email" name="email" type="email" required></ion-input>
+      </ion-item>
+
+      <ion-item lines="full">
+        <ion-label position="floating">Phone</ion-label>
+        <ion-input [(ngModel)]="form.phone" name="phone" required></ion-input>
+      </ion-item>
+
+      <ion-item lines="full">
+        <ion-label position="floating">Message</ion-label>
+        <ion-textarea [(ngModel)]="form.message" name="message" rows="6" required></ion-textarea>
+      </ion-item>
+
+      <!-- Image Upload -->
+      <ion-item lines="none">
+        <ion-label>Upload Image (optional)</ion-label>
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" class="mt-2" />
+      </ion-item>
+
+      <div *ngIf="previewUrl" class="ion-text-center ion-padding">
+        <p><strong>Preview:</strong></p>
+        <ion-img [src]="previewUrl" style="max-width: 300px; border-radius: 12px;"></ion-img>
+      </div>
+
+      <ion-button expand="block" type="submit" [disabled]="f.invalid" class="ion-margin-top">
+        Submit Application
+      </ion-button>
+    </form>
+
+    <ion-note *ngIf="success" color="success" class="ion-text-center block ion-padding">
+      <strong>Submitted Successfully!</strong>
+    </ion-note>
+
+    <div class="ion-text-center ion-margin-top">
+      <a routerLink="/admin" class="text-primary font-bold">Go to Admin Panel →</a>
+    </div>
+  </div>
+</ion-content>

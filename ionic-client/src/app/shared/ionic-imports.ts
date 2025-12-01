@@ -1,0 +1,52 @@
+// src/app/shared/ionic-imports.ts
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+
+// Ionic Standalone Components - ALL used in the app
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonTextarea,
+  IonButton,
+  IonImg,
+  IonNote,
+  IonList,
+  IonSelect,
+  IonSelectOption,
+  IonCard,
+  IonCardContent,
+  IonButtons,
+  IonBackButton
+} from '@ionic/angular/standalone';
+
+// Export everything in one clean object
+export const SHARED_IMPORTS = [
+  CommonModule,
+  FormsModule,
+  RouterLink,
+
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonTextarea,
+  IonButton,
+  IonImg,
+  IonNote,
+  IonList,
+  IonSelect,
+  IonSelectOption,
+  IonCard,
+  IonCardContent,
+  IonButtons,
+  IonBackButton
+] as const;

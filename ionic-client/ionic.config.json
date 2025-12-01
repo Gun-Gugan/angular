@@ -1,0 +1,7 @@
+{
+  "name": "ionic-application-form",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

@@ -1,9 +1,7 @@
-// src/app/shared/ionic-imports.ts
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
-// Ionic Standalone Components - ALL used in the app
 import {
   IonHeader,
   IonToolbar,

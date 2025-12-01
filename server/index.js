@@ -22,6 +22,8 @@ app.get('/', (req, res) => {
   res.send('<h1>Backend Running Successfully! User Admin App API is Live</h1>');
 });
 
+app.use('/uploads', express.static('uploads'));
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

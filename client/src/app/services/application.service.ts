@@ -5,12 +5,23 @@ import { Application } from '../models/application.model';
 
 @Injectable({ providedIn: 'root' })
 export class ApplicationService {
-  private api = 'http://localhost:5000/api/applications';
+  private apiUrl = 'http://localhost:5000/api/applications';
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<Application[]> { return this.http.get<Application[]>(this.api); }
-  submit(data: any) { return this.http.post(this.api, { ...data, status: 'pending' }); }
-  update(id: string, data: any) { return this.http.put(`${this.api}/${id}`, data); }
-  delete(id: string) { return this.http.delete(`${this.api}/${id}`); }
+  submit(data: any): Observable<any> {
+    return this.http.post(this.apiUrl, data); // FormData → no Content-Type header needed
+  }
+
+  getAll(): Observable<Application[]> {
+    return this.http.get<Application[]>(this.apiUrl);
+  }
+
+  update(id: string, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, data);
+  }
+
+  delete(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
 }

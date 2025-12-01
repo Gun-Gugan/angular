@@ -3,6 +3,7 @@
   <table class="w-full border-collapse border border-gray-300">
     <thead>
       <tr class="bg-gray-200">
+        <th class="border border-gray-300 p-2">Image</th>
         <th class="border border-gray-300 p-2">Name</th>
         <th class="border border-gray-300 p-2">Email</th>
         <th class="border border-gray-300 p-2">Phone</th>
@@ -13,6 +14,15 @@
     </thead>
     <tbody>
       <tr *ngFor="let app of applications">
+        <td class="border border-gray-300 p-2 text-center">
+        <img 
+          *ngIf="app.image"
+          [src]="baseUrl + app.image"
+          alt="Application image"
+          class="w-20 h-20 object-cover rounded mx-auto border"
+          onerror="this.style.display='none'">
+        <span *ngIf="!app.image" class="text-gray-400 text-sm">No image</span>
+      </td>
         <td class="border border-gray-300 p-2"><input [(ngModel)]="app.name" class="w-full p-1 border"></td>
         <td class="border border-gray-300 p-2"><input [(ngModel)]="app.email" class="w-full p-1 border"></td>
         <td class="border border-gray-300 p-2"><input [(ngModel)]="app.phone" class="w-full p-1 border"></td>

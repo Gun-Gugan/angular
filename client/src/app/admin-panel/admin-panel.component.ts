@@ -15,6 +15,8 @@ import { RouterLink } from '@angular/router';
 export class AdminPanelComponent implements OnInit {
   applications: Application[] = [];
 
+  baseUrl = 'http://localhost:5000';
+  
   constructor(private service: ApplicationService) {}
 
   ngOnInit() {

@@ -5,6 +5,7 @@ const applicationSchema = new mongoose.Schema({
   email: { type: String, required: true },
   phone: { type: String, required: true },
   message: { type: String, required: true },
+  image: { type: String },
   status: {
     type: String,
     enum: ['pending', 'approved', 'rejected'],

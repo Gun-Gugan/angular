@@ -1,8 +1,21 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 const Application = require('../models/Applications');
 
-// GET all applications
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage });
+
 router.get('/', async (req, res) => {
   try {
     const apps = await Application.find().sort({ createdAt: -1 });
@@ -12,15 +25,16 @@ router.get('/', async (req, res) => {
   }
 });
 
-// CREATE new application
-router.post('/', async (req, res) => {
-  const app = new Application({
+router.post('/', upload.single('image'), async (req, res) => {
+  const appData = {
     name: req.body.name,
     email: req.body.email,
     phone: req.body.phone,
-    message: req.body.message
-  });
+    message: req.body.message,
+    image: req.file ? `/uploads/${req.file.filename}` : undefined
+  };
 
+  const app = new Application(appData);
   try {
     const newApp = await app.save();
     res.status(201).json(newApp);
@@ -29,12 +43,15 @@ router.post('/', async (req, res) => {
   }
 });
 
-// UPDATE application (edit / approve / reject)
-router.put('/:id', async (req, res) => {
+router.put('/:id', upload.single('image'), async (req, res) => {
   try {
+    const updateData = { ...req.body };
+    if (req.file) {
+      updateData.image = `/uploads/${req.file.filename}`;
+    }
     const updated = await Application.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true }
     );
     res.json(updated);
@@ -43,7 +60,6 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE application
 router.delete('/:id', async (req, res) => {
   try {
     await Application.findByIdAndDelete(req.params.id);

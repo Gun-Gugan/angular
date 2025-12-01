@@ -4,6 +4,8 @@ export interface Application {
   email: string;
   phone: string;
   message: string;
+  image?: string;
   status: 'pending' | 'approved' | 'rejected';
   createdAt?: string;
+  updatedAt?: string;
 }

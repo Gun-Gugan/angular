@@ -8,38 +8,88 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+
+  <!-- Hidden content for "Download All" PDF -->
+  <div id="pdfContentAll" style="position:absolute; left:-9999px; top:-9999px; background:white; padding:30px; width:210mm; font-family:Arial;">
+    <h1 style="text-align:center; color:#3880ff;">All Applications Report</h1>
+    <p style="text-align:center;">Generated: {{ today | date:'long' }} | Total: {{ applications.length }}</p>
+    <hr>
+    <div *ngFor="let app of applications; let i = index">
+      <h3>{{ i + 1 }}. {{ app.name }} ({{ app.status | titlecase }})</h3>
+      <p><strong>Email:</strong> {{ app.email }}</p>
+      <p><strong>Phone:</strong> {{ app.phone }}</p>
+      <p><strong>Message:</strong> {{ app.message || '—' }}</p>
+      <p><strong>Images:</strong> {{ app.images.length }} attached</p>
+      <hr *ngIf="i < applications.length - 1">
+    </div>
+  </div>
+
+  <!-- Main List -->
   <ion-list>
     <ion-item *ngFor="let app of applications">
       <ion-card class="w-full">
         <ion-card-content>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+
+            <!-- Image Gallery (FIXED!) -->
             <div class="text-center">
-              <ion-img
-                *ngIf="app.image"
-                [src]="baseUrl + app.image"
-                style="width:120px;height:120px;object-fit:cover;border-radius:8px;margin:0 auto;"
-                alt="Application image">
-              </ion-img>
-              <p *ngIf="!app.image" class="text-gray-500">No image</p>
+              <ng-container *ngIf="app.images.length > 0; else noImage">
+                <!-- Main Image -->
+                <ion-img
+                  [src]="baseUrl + app.images[0]"
+                  (click)="openImageModal(app.images[0])"
+                  class="main-img"
+                ></ion-img>
+
+                <!-- Thumbnails -->
+                <div class="thumbnails" *ngIf="app.images.length > 1">
+                  <img
+                    *ngFor="let img of app.images.slice(1, 6)"
+                    [src]="baseUrl + img"
+                    (click)="openImageModal(img)"
+                    class="thumb"
+                  />
+                  <div *ngIf="app.images.length > 6" class="more">
+                    +{{ app.images.length - 6 }} more
+                  </div>
+                </div>
+              </ng-container>
+
+              <ng-template #noImage>
+                <div class="no-image">
+                  <ion-icon name="image-outline" size="large" color="medium"></ion-icon>
+                  <p class="text-gray-500 text-sm">No image</p>
+                </div>
+              </ng-template>
             </div>
 
-            <div class="space-y-2">
+            <!-- Form Fields -->
+            <div class="space-y-4">
               <ion-input label="Name" labelPlacement="stacked" [(ngModel)]="app.name"></ion-input>
               <ion-input label="Email" labelPlacement="stacked" [(ngModel)]="app.email" type="email"></ion-input>
               <ion-input label="Phone" labelPlacement="stacked" [(ngModel)]="app.phone"></ion-input>
-              <ion-textarea label="Message" labelPlacement="stacked" [(ngModel)]="app.message" rows="3"></ion-textarea>
+              <ion-textarea label="Message" labelPlacement="stacked" [(ngModel)]="app.message" rows="5"></ion-textarea>
             </div>
 
-            <div class="flex flex-col justify-between">
+            <!-- Actions -->
+            <div class="flex flex-col gap-4">
               <ion-select label="Status" [(ngModel)]="app.status" (ionChange)="save(app)">
                 <ion-select-option value="pending">Pending</ion-select-option>
                 <ion-select-option value="approved">Approved</ion-select-option>
                 <ion-select-option value="rejected">Rejected</ion-select-option>
               </ion-select>
 
-              <div class="mt-4">
-                <ion-button fill="solid" color="primary" size="small" (click)="save(app)">Save</ion-button>
-                <ion-button fill="solid" color="danger" size="small" (click)="delete(app._id!)">Delete</ion-button>
+              <div class="flex flex-wrap gap-2">
+                <ion-button fill="solid" color="primary" size="small" (click)="save(app)">
+                  Save
+                </ion-button>
+                <ion-button fill="solid" color="danger" size="small" (click)="delete(app._id!)">
+                  Delete
+                </ion-button>
+                <ion-button fill="outline" color="success" size="small" (click)="downloadSinglePDF(app)">
+                  <ion-icon name="download" slot="start"></ion-icon>
+                  PDF
+                </ion-button>
               </div>
             </div>
           </div>
@@ -48,7 +98,14 @@
     </ion-item>
   </ion-list>
 
-  <div class="text-center mt-8">
-    <a routerLink="/" class="text-primary">← Back to Form</a>
+  <!-- Floating Button: Download All -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="tertiary" size="large" (click)="downloadAllPDF()">
+      <ion-icon name="download-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <div class="text-center mt-10">
+    <a routerLink="/" class="text-primary">Back to Form</a>
   </div>
 </ion-content>

@@ -8,16 +8,16 @@ export interface Application {
   email: string;
   phone: string;
   message: string;
-  image?: string;
+  images: string[];
   status: 'pending' | 'approved' | 'rejected';
   createdAt?: string;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApplicationService {
-  private apiUrl = 'http://localhost:5000/api/applications'; // Change if your backend is elsewhere
+  private apiUrl = 'https://ionic-server-dma2.onrender.com/api/applications';
 
   constructor(private http: HttpClient) {}
 

@@ -1,0 +1,314 @@
+// ===========================
+// Multi-Step Application Form
+// ===========================
+
+.max-w-2xl {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+// Progress Steps Indicator
+.steps-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 40px 0 50px;
+  flex-wrap: nowrap;
+  gap: 20px;
+
+  .step {
+    text-align: center;
+    flex: 1;
+    position: relative;
+
+    span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      color: #888;
+      font-weight: bold;
+      font-size: 20px;
+      margin: 0 auto 10px;
+      transition: all 0.4s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    small {
+      font-size: 12px;
+      color: #666;
+      font-weight: 500;
+      display: block;
+      white-space: nowrap;
+    }
+
+    &.active span {
+      background: var(--ion-color-primary);
+      color: white;
+      transform: scale(1.15);
+      box-shadow: 0 0 20px rgba(var(--ion-color-primary-rgb), 0.4);
+    }
+
+    &.completed span {
+      background: var(--ion-color-success);
+      color: white;
+      position: relative;
+
+      &::after {
+        content: "✓";
+        font-size: 24px;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .connector {
+    flex: 1;
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    transition: background 0.4s ease;
+    margin: 0 10px;
+
+    &.active {
+      background: var(--ion-color-primary);
+      box-shadow: 0 0 10px rgba(var(--ion-color-primary-rgb), 0.5);
+    }
+  }
+}
+
+// Step Content Animation
+.step-content {
+  animation: slideIn 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+
+  &.ng-enter {
+    animation: slideIn 0.6s ease-out forwards;
+  }
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Titles & Text
+.title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 20px 0 10px;
+  color: var(--ion-color-dark);
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+  margin-bottom: 30px;
+}
+
+.req {
+  color: var(--ion-color-danger);
+  font-weight: bold;
+}
+
+// Upload Buttons Grid
+.upload-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 30px 0;
+
+  ion-button {
+    --border-radius: 16px;
+    height: 60px;
+    font-size: 16px;
+    text-transform: none;
+  }
+}
+
+// Photo Preview
+.preview-box {
+  text-align: center;
+  margin: 40px 0;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 20px;
+  box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.05);
+
+  img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 18px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+    cursor: zoom-in;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+
+  ion-button {
+    margin-top: 16px;
+    --color: var(--ion-color-medium);
+  }
+}
+
+// Action Buttons (Back + Submit)
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 40px;
+
+  ion-button {
+    --border-radius: 16px;
+    height: 56px;
+    font-size: 17px;
+    font-weight: 600;
+    text-transform: none;
+  }
+}
+
+// Success Screen
+.success-screen {
+  text-align: center;
+  padding: 80px 20px;
+  animation: fadeInUp 1s ease-out;
+
+  .big-icon {
+    font-size: 120px;
+    margin-bottom: 30px;
+    display: block;
+    animation: bounce 2s infinite;
+  }
+
+  h1 {
+    font-size: 36px;
+    font-weight: 800;
+    margin: 20px 0;
+    background: linear-gradient(90deg, var(--ion-color-success), var(--ion-color-primary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  p {
+    font-size: 18px;
+    color: #444;
+    line-height: 1.6;
+  }
+
+  .highlight {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--ion-color-success);
+    margin: 20px 0;
+  }
+
+  ion-button {
+    --border-radius: 16px;
+    height: 56px;
+    font-size: 17px;
+    margin-top: 30px;
+  }
+
+  .admin-link {
+    display: block;
+    margin-top: 40px;
+    color: var(--ion-color-primary);
+    font-weight: bold;
+    font-size: 17px;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(var(--ion-color-primary-rgb), 0.1);
+    transition: all 0.3s;
+
+    &:hover {
+      background: rgba(var(--ion-color-primary-rgb), 0.2);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// Animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+}
+
+// Responsive
+@media (max-width: 480px) {
+  .steps-container {
+    gap: 10px;
+    .connector { min-width: 30px; }
+    small { font-size: 10px; }
+  }
+
+  .upload-buttons,
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .title { font-size: 24px; }
+  .success-screen h1 { font-size: 30px; }
+}
+
+.multi-preview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.img-item {
+  position: relative;
+}
+
+.img-item img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 2px solid #ccc;
+}
+
+.remove-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  z-index: 10;
+  --padding-start: 4px;
+  --padding-end: 4px;
+  transform: scale(0.9);
+}

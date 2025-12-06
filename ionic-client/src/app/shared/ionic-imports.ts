@@ -20,7 +20,10 @@ import {
   IonCard,
   IonCardContent,
   IonButtons,
-  IonBackButton
+  IonBackButton,
+  IonFab,           
+  IonFabButton,
+  IonIcon
 } from '@ionic/angular/standalone';
 
 // Export everything in one clean object
@@ -46,5 +49,8 @@ export const SHARED_IMPORTS = [
   IonCard,
   IonCardContent,
   IonButtons,
-  IonBackButton
+  IonBackButton,
+  IonFab,
+  IonFabButton,
+  IonIcon
 ] as const;

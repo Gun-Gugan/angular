@@ -1,55 +1,182 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-title>Application Form</ion-title>
+
+    <ion-buttons slot="end" *ngIf="currentStep > 1 && currentStep < 3">
+      <ion-button fill="clear" color="light" (click)="currentStep = 1">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content class="ion-padding">
   <div class="max-w-2xl mx-auto">
-    <form (ngSubmit)="submit()" #f="ngForm">
-
-      <ion-item lines="full">
-        <ion-label position="floating">Name</ion-label>
-        <ion-input [(ngModel)]="form.name" name="name" required></ion-input>
-      </ion-item>
-
-      <ion-item lines="full">
-        <ion-label position="floating">Email</ion-label>
-        <ion-input [(ngModel)]="form.email" name="email" type="email" required></ion-input>
-      </ion-item>
-
-      <ion-item lines="full">
-        <ion-label position="floating">Phone</ion-label>
-        <ion-input [(ngModel)]="form.phone" name="phone" required></ion-input>
-      </ion-item>
-
-      <ion-item lines="full">
-        <ion-label position="floating">Message</ion-label>
-        <ion-textarea [(ngModel)]="form.message" name="message" rows="6" required></ion-textarea>
-      </ion-item>
-
-      <!-- Image Upload -->
-      <ion-item lines="none">
-        <ion-label>Upload Image (optional)</ion-label>
-        <input type="file" accept="image/*" (change)="onFileSelected($event)" class="mt-2" />
-      </ion-item>
-
-      <div *ngIf="previewUrl" class="ion-text-center ion-padding">
-        <p><strong>Preview:</strong></p>
-        <ion-img [src]="previewUrl" style="max-width: 300px; border-radius: 12px;"></ion-img>
+    <!-- Steps -->
+    <div class="steps-container ion-margin-bottom">
+      <div
+        class="step"
+        [class.active]="currentStep === 1"
+        [class.completed]="currentStep > 1"
+      >
+        <span>1</span>
+        <small>Personal Info</small>
       </div>
 
-      <ion-button expand="block" type="submit" [disabled]="f.invalid" class="ion-margin-top">
-        Submit Application
-      </ion-button>
+      <div class="connector" [class.active]="currentStep >= 2"></div>
+
+      <div
+        class="step"
+        [class.active]="currentStep === 2"
+        [class.completed]="currentStep > 2"
+      >
+        <span>2</span>
+        <small>Photo</small>
+      </div>
+
+      <div class="connector" [class.active]="currentStep >= 3"></div>
+
+      <div class="step" [class.active]="currentStep === 3">
+        <span>3</span>
+        <small>Done</small>
+      </div>
+    </div>
+
+    <form [formGroup]="appForm" (ngSubmit)="submit()" *ngIf="currentStep < 3">
+      <!-- STEP 1 -->
+      <div *ngIf="currentStep === 1" class="step-content">
+        <h2 class="title">Tell us about yourself</h2>
+
+        <ion-item>
+          <ion-label position="floating">Full Name *</ion-label>
+          <ion-input formControlName="name"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Email *</ion-label>
+          <ion-input type="email" formControlName="email"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Phone Number *</ion-label>
+          <ion-input formControlName="phone"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Message *</ion-label>
+          <ion-textarea rows="5" formControlName="message"></ion-textarea>
+        </ion-item>
+
+        <ion-button
+          expand="block"
+          color="primary"
+          class="ion-margin-top"
+          (click)="nextStep()"
+        >
+          Next: Add Photo
+          <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+        </ion-button>
+        <div class="ion-text-center ion-margin-top">
+          <a routerLink="/admin" class="admin-link">Go to Admin Panel →</a>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div *ngIf="currentStep === 2" class="step-content">
+        <h2 class="title">Add Your Photo</h2>
+        <p class="ion-text-center subtitle">Make a good impression!</p>
+
+        <input
+          type="file"
+          #fileInput
+          accept="image/*"
+          (change)="onFileSelected($event)"
+          hidden
+          multiple
+        />
+
+        <div class="upload-buttons">
+          <ion-button
+            expand="block"
+            color="secondary"
+            (click)="fileInput.click()"
+          >
+            <ion-icon name="image-outline" slot="start"></ion-icon>
+            Choose from Gallery
+          </ion-button>
+
+          <ion-button expand="block" color="secondary" (click)="takePhoto()">
+            <ion-icon name="camera-outline" slot="start"></ion-icon>
+            Take Photo
+          </ion-button>
+        </div>
+
+        <!-- MULTIPLE IMAGE PREVIEW GRID -->
+        <!-- MULTIPLE IMAGE PREVIEW GRID -->
+        <div class="multi-preview" *ngIf="previewUrls.length > 0">
+          <div class="img-item" *ngFor="let img of previewUrls; let i = index">
+            <!-- Preview Image -->
+            <img [src]="img" (click)="openImageModal(img)" />
+
+            <!-- Delete Image -->
+            <ion-button
+              class="remove-btn"
+              fill="clear"
+              color="danger"
+              size="small"
+              (click)="removeImage(i); $event.stopPropagation()"
+            >
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <ion-button
+            expand="block"
+            fill="outline"
+            color="medium"
+            (click)="currentStep = 1"
+          >
+            <ion-icon name="chevron-back-outline" slot="start"></ion-icon> Back
+          </ion-button>
+
+          <ion-button
+            expand="block"
+            color="success"
+            type="submit"
+            [disabled]="previewUrls.length === 0 || isSubmitting"
+          >
+            <ion-spinner *ngIf="isSubmitting"></ion-spinner>
+            {{ isSubmitting ? "Submitting..." : "Submit Application" }}
+          </ion-button>
+        </div>
+      </div>
     </form>
 
-    <ion-note *ngIf="success" color="success" class="ion-text-center block ion-padding">
-      <strong>Submitted Successfully!</strong>
-    </ion-note>
+    <!-- STEP 3 -->
+    <div *ngIf="currentStep === 3" class="success-screen">
+      <ion-icon
+        name="checkmark-circle"
+        color="success"
+        class="big-icon"
+      ></ion-icon>
+      <h1>Thank You!</h1>
+      <p>Your application has been submitted successfully.</p>
 
-    <div class="ion-text-center ion-margin-top">
-      <a routerLink="/admin" class="text-primary font-bold">Go to Admin Panel →</a>
+      <ion-button
+        expand="block"
+        color="primary"
+        (click)="resetForm()"
+        class="ion-margin-top"
+      >
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Submit Another
+      </ion-button>
+
+      <div class="ion-text-center ion-margin-top">
+        <a routerLink="/admin" class="admin-link">Go to Admin Panel →</a>
+      </div>
     </div>
   </div>
 </ion-content>

@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Image Preview</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="img-wrapper" *ngIf="preview; else loading">
+    <img [src]="preview" pinchZoom alt="Preview" />
+  </div>
+
+  <ng-template #loading>
+    <div class="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading image...</p>
+    </div>
+  </ng-template>
+</ion-content>

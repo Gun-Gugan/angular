@@ -1,33 +1,149 @@
 import { Component, OnInit } from '@angular/core';
 import { ApplicationService, Application } from '../../services/application.service';
 import { SHARED_IMPORTS } from '../../shared/ionic-imports';
+import { ModalController, LoadingController } from '@ionic/angular/standalone';
+import { ImageModalComponent } from 'src/app/model/model.component';
+import { addIcons } from 'ionicons';
+import { downloadOutline, download } from 'ionicons/icons';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-admin',
-  templateUrl: 'admin.component.html',
-  styleUrls: ['admin.component.scss'],
+  templateUrl: './admin.component.html',
+  styleUrls: ['./admin.component.scss'],
   standalone: true,
-  imports: [SHARED_IMPORTS]
+  imports: [SHARED_IMPORTS,CommonModule]
 })
 export class AdminPage implements OnInit {
   applications: Application[] = [];
-  baseUrl = 'http://localhost:5000';
+  baseUrl = 'https://ionic-server-dma2.onrender.com';
+  today = new Date();
 
-  constructor(private service: ApplicationService) {}
+  constructor(
+    private service: ApplicationService,
+    private modalCtrl: ModalController,
+    private loadingCtrl: LoadingController
+  ) {
+    addIcons({ downloadOutline, download });
+  }
 
-  ngOnInit() { this.load(); }
+  ngOnInit() {
+    this.load();
+  }
 
   load() {
-    this.service.getAll().subscribe(data => this.applications = data);
+    this.service.getAll().subscribe(data => {
+      this.applications = data;
+    });
   }
 
   save(app: Application) {
-    this.service.update(app._id!, app).subscribe(() => alert('Saved!'));
+    this.service.update(app._id!, app).subscribe(() => {
+      alert('Saved successfully!');
+    });
   }
 
   delete(id: string) {
-    if (confirm('Delete this entry?')) {
+    if (confirm('Delete this application permanently?')) {
       this.service.delete(id).subscribe(() => this.load());
+    }
+  }
+
+  async openImageModal(imagePath: string) {
+    const modal = await this.modalCtrl.create({
+      component: ImageModalComponent,
+      componentProps: { imageSource: this.baseUrl + imagePath },
+      cssClass: 'full-screen-modal'
+    });
+    await modal.present();
+  }
+
+  // Download PDF for ALL applications
+  async downloadAllPDF() {
+    const loading = await this.loadingCtrl.create({ message: 'Generating All Applications PDF...' });
+    await loading.present();
+
+    const element = document.getElementById('pdfContentAll');
+    if (!element) {
+      loading.dismiss();
+      alert('Content not found');
+      return;
+    }
+
+    const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const width = pdf.internal.pageSize.getWidth();
+    const height = (canvas.height * width) / canvas.width;
+    pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+    pdf.save(`all-applications_${new Date().toISOString().slice(0,10)}.pdf`);
+    loading.dismiss();
+  }
+
+  // Download PDF for ONE application (with images!)
+  async downloadSinglePDF(app: Application) {
+    const loading = await this.loadingCtrl.create({ message: 'Generating PDF...' });
+    await loading.present();
+
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.top = '-9999px';
+    tempDiv.style.width = '210mm';
+    tempDiv.style.padding = '30px';
+    tempDiv.style.background = 'white';
+    tempDiv.style.fontFamily = 'Arial, sans-serif';
+    tempDiv.style.color = 'black';
+
+    tempDiv.innerHTML = `
+      <div style="text-align:center; margin-bottom:30px;">
+        <h1 style="color:#3880ff; margin:0;">Application Details</h1>
+        <p style="margin:10px 0; color:#555;">Generated on ${new Date().toLocaleString()}</p>
+      </div>
+      <hr style="margin:20px 0;">
+      <h2 style="margin:10px 0;">${app.name}</h2>
+      <p><strong>Email:</strong> ${app.email}</p>
+      <p><strong>Phone:</strong> ${app.phone}</p>
+      <p><strong>Status:</strong> <span style="color:${app.status === 'approved' ? 'green' : app.status === 'rejected' ? 'red' : 'orange'};">${app.status.toUpperCase()}</span></p>
+      <p><strong>Message:</strong><br>${app.message ? app.message.replace(/\n/g, '<br>') : '—'}</p>
+      <p><strong>Images Attached:</strong> ${app.images.length}</p>
+      <div style="margin-top:25px; display:flex; flex-wrap:wrap; gap:15px; justify-content:center;">
+        ${app.images.map(img => `
+          <img src="${this.baseUrl + img}" style="width:180px; height:180px; object-fit:cover; border-radius:12px; border:3px solid #ddd; box-shadow:0 4px 8px rgba(0,0,0,0.1);" />
+        `).join('')}
+      </div>
+      <div style="margin-top:50px; text-align:center; color:#888; font-size:12px; border-top:1px solid #eee; padding-top:15px;">
+        <p>Application ID: ${app._id}</p>
+        <p>Generated by Admin Panel</p>
+      </div>
+    `;
+
+    document.body.appendChild(tempDiv);
+
+    try {
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const width = pdf.internal.pageSize.getWidth();
+      const height = (canvas.height * width) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+      pdf.save(`${app.name.replace(/[^a-z0-9]/gi, '_')}_application.pdf`);
+
+      document.body.removeChild(tempDiv);
+      loading.dismiss();
+    } catch (err) {
+      document.body.removeChild(tempDiv);
+      loading.dismiss();
+      console.error(err);
+      alert('Failed to generate PDF');
     }
   }
 }

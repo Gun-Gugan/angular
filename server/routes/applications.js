@@ -31,39 +31,46 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', upload.single('image'), async (req, res) => {
+router.post('/', upload.array('images', 10), async (req, res) => {
+  const imagePaths = req.files?.map(f => `/uploads/${f.filename}`) || [];
+
   const appData = {
     name: req.body.name,
     email: req.body.email,
     phone: req.body.phone,
     message: req.body.message,
-    image: req.file ? `/uploads/${req.file.filename}` : undefined
+    images: imagePaths
   };
-  const app = new Application(appData);
+
   try {
-    const newApp = await app.save();
+    const newApp = await Application.create(appData);
     res.status(201).json(newApp);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
 
-router.put('/:id', upload.single('image'), async (req, res) => {
+
+router.put('/:id', upload.array('images', 10), async (req, res) => {
   try {
     const updateData = { ...req.body };
-    if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`;
+
+    if (req.files?.length) {
+      updateData.images = req.files.map(f => `/uploads/${f.filename}`);
     }
+
     const updated = await Application.findByIdAndUpdate(
       req.params.id,
       updateData,
       { new: true }
     );
+
     res.json(updated);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 router.delete('/:id', async (req, res) => {
   try {

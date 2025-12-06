@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', upload.array('images', 10), async (req, res) => {
+router.post('/', upload.array('images[]', 10), async (req, res) => {
   const imagePaths = req.files?.map(f => `/uploads/${f.filename}`) || [];
 
   const appData = {
@@ -51,7 +51,7 @@ router.post('/', upload.array('images', 10), async (req, res) => {
 });
 
 
-router.put('/:id', upload.array('images', 10), async (req, res) => {
+router.put('/:id', upload.array('images[]', 10), async (req, res) => {
   try {
     const updateData = { ...req.body };
 
